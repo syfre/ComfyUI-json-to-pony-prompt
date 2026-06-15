@@ -1,0 +1,40 @@
+{
+  "quality": [
+    "score_9",
+    "score_8_up",
+    "score_7_up",
+    "rating_safe"
+  ],
+  "subject": [
+    "1girl",
+    "solo",
+    "silver hair",
+    "blue eyes"
+  ],
+  "body": [
+    "slim"
+  ],
+  "clothing": [
+    "hoodie",
+    "black skirt"
+  ],
+  "pose": [
+    "standing",
+    "looking at viewer"
+  ],
+  "camera": [
+    "full body"
+  ],
+  "environment": [
+    "cyberpunk city",
+    "rain"
+  ],
+  "style": [
+    "anime",
+    "cinematic lighting"
+  ],
+  "boosters": [
+    "masterpiece",
+    "detailed eyes"
+  ]
+}
