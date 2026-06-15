@@ -15,7 +15,7 @@ class PonyJsonPrompt:
             "required": {
                 "json_text": ("STRING", {
                     "multiline": True,
-                    "default": '{"quality":[],"subject":[],"description":[],"pose":[],"clothing":[],"lighting":[],"composition":[],"booster":[]}'
+                    "default": '{"quality":["score_9","score_8_up","score_7_up","rating_explicit"],\n"subject":["1girl"],\n"description":[],\n"pose":[],\n"clothing":[],\n"lighting":[],\n"composition":[],\n"booster":["realistic skin","high quality","masterpiece","cinematic"]}'
                 }),
                 "linebreak": ("BOOLEAN", {
                     "default": False
