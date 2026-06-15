@@ -15,7 +15,7 @@ class PonyJsonPrompt:
             "required": {
                 "json_text": ("STRING", {
                     "multiline": True,
-                    "default": "{}"
+                    "default": '{"quality":[],"subject":[],"description":[],"pose":[],"clothing":[],"lighting":[],"composition":[],"booster":[]}'
                 }),
                 "linebreak": ("BOOLEAN", {
                     "default": False
