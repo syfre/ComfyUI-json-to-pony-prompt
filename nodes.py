@@ -15,7 +15,7 @@ class PonyJsonPrompt:
             "required": {
                 "json_text": ("STRING", {
                     "multiline": True,
-                    "default": '{"quality":["score_9","score_8_up","score_7_up","rating_explicit"],\n"subject":["1girl"],\n"description":[],\n"pose":[],\n"clothing":[],\n"lighting":[],\n"composition":[],\n"booster":["realistic skin","high quality","masterpiece","cinematic"]}'
+                    "default": '{"quality":["score_9","score_8_up","score_7_up","rating_explicit"],\n"subject":["1girl"],\n"description":["18yo","blonde hair","slim","cute face"],\n"pose":["lying on tanning chair"],\n"clothing":["blue towel under"],\n"environment":["pool in background"],\n"lighting":["bright sunlight"],\n"composition":["full body"],\n"boosters":["realistic skin","high quality","masterpiece","cinematic"]}'
                 }),
                 "linebreak": ("BOOLEAN", {
                     "default": False
@@ -38,8 +38,8 @@ class PonyJsonPrompt:
         "clothing",
         "camera",
         "settings",
-        "lighting",
         "environment",
+        "lighting",
         "style",
         "composition",
         "boosters"
