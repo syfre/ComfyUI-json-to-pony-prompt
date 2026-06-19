@@ -3,6 +3,8 @@ ComfyUI-json-to-pony-prompt: Json to Pony prompt.
 """
 import os
 import importlib.util
+from .routes import setup_routes
+
 
 # Load nodes.py from this package directory (works regardless of package context)
 _this_dir = os.path.dirname(os.path.abspath(__file__))
@@ -11,7 +13,12 @@ _spec = importlib.util.spec_from_file_location("ComfyUI_json_to_pony_prompt", _n
 _mod = importlib.util.module_from_spec(_spec)
 _spec.loader.exec_module(_mod)
 
+
+# Register custom route
+setup_routes()
+
 NODE_CLASS_MAPPINGS = _mod.NODE_CLASS_MAPPINGS
 NODE_DISPLAY_NAME_MAPPINGS = getattr(_mod, "NODE_DISPLAY_NAME_MAPPINGS", {})
 
-__all__ = ["NODE_CLASS_MAPPINGS", "NODE_DISPLAY_NAME_MAPPINGS"]
+WEB_DIRECTORY = "./js"
+__all__ = ["NODE_CLASS_MAPPINGS", "NODE_DISPLAY_NAME_MAPPINGS", "WEB_DIRECTORY"]

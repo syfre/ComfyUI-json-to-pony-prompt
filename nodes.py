@@ -23,16 +23,18 @@ class PonyJsonPrompt:
             }
         }
 
-    RETURN_TYPES = ("STRING",)
-    RETURN_NAMES = ("prompt",)
+    RETURN_TYPES = ("STRING","STRING")
+    RETURN_NAMES = ("prompt","prettyJson")
     FUNCTION = "build_prompt"
     CATEGORY = "prompt"
 
     SECTION_ORDER = [
         "quality",
+        "source",
         "subject",
         "body",
         "description",
+        "expression",
         "pose",
         "action",
         "clothing",
@@ -77,7 +79,7 @@ class PonyJsonPrompt:
 
         prompt = sep.join(sections)
 
-        return (prompt,)
+        return (prompt,json.dumps(data,indent=2))
 
 
 NODE_CLASS_MAPPINGS = {
