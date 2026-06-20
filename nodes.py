@@ -51,7 +51,7 @@ class PonyJsonPrompt:
         try:
             data = json.loads(json_text)
         except Exception as e:
-            return (f"JSON ERROR: {e}",)
+            return (json_text, "{}")
 
         sections = []
         sep = ", "
@@ -71,7 +71,7 @@ class PonyJsonPrompt:
             values = [
                 str(v).strip()
                 for v in values
-                if str(v).strip()
+                if str(v).strip() and not str(v).strip().startswith("!")
             ]
 
             if values:
