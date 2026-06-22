@@ -172,9 +172,17 @@ function splitOutsideParens(str) {
         }
     }
     //
-    if (ch === ',' && depth === 0 && lora===0) {
-    if (current!='BREAK') result.strings.push(current.trim());
-    current = '';
+    if ( ( (ch === ',') || (ch === ".") ) && (depth === 0) && (lora===0) ) {
+        if (current!='BREAK')  {
+            const term = current.trim()
+            // if start by a connector then append to the last
+            if ((term.startsWith("and ") || term.startsWith("with ")) && (result.strings.length>0)) {
+                result.strings[result.strings.length-1] = result.strings[result.strings.length-1]+" "+term
+            } else {
+                result.strings.push(term);
+            }
+        }
+        current = ''; 
     } else {
     current += ch;
     }
@@ -191,14 +199,13 @@ function containsWord(str, word) {
 function toJson(text) {
 
     let rslt = JSON.parse(jsonEmpty);
-    const data = splitOutsideParens(text.replace(/BREAK/g, ""));
+    const data = splitOutsideParens(text.replace(/BREAK/g, "").replace(/[\n\r]+/g, ''));
     const str_array = data.strings;
 
     for(var i = 0; i < str_array.length; i++) {
         const str = str_array[i];
         const strL = str.toLowerCase().replace("_"," ");
 
-        
         str.startsWith("score")  ? rslt.quality.push(str) :
         str.startsWith("Score")  ? rslt.quality.push(str.toLowerCase()) :
         str.startsWith("rating") ? rslt.quality.push(str) :
@@ -217,6 +224,7 @@ function toJson(text) {
         containsWord(strL,"1boy")     ? rslt.subject.push(str) :
         containsWord(strL,"2boy")    ? rslt.subject.push(str) :
         containsWord(strL,"2boys")    ? rslt.subject.push(str) :
+        containsWord(strL,"1man")     ? rslt.subject.push(str) :
         containsWord(strL,"2man")     ? rslt.subject.push(str) :
         containsWord(strL,"2men")     ? rslt.subject.push(str) :
         containsWord(strL,"two boys")  ? rslt.subject.push(str) :
@@ -262,6 +270,7 @@ function toJson(text) {
         containsWord(strL,"unshaved")  ? rslt.description.push(str) :
         containsWord(strL,"topless")      ? rslt.description.push(str) :
         containsWord(strL,"wet")  ? rslt.description.push(str) :
+        containsWord(strL,"tatooed")  ? rslt.description.push(str) :
         //
         containsWord(strL,"hair")     ? rslt.description.push(str) :
         containsWord(strL,"hairstyle")     ? rslt.description.push(str) :
@@ -360,7 +369,6 @@ function toJson(text) {
         containsWord(strL,"despair")  ? rslt.description.push(str) :
         containsWord(strL,"surprised")  ? rslt.description.push(str) :
         containsWord(strL,"curious")  ? rslt.description.push(str) :
-        containsWord(strL,"curious")  ? rslt.description.push(str) :
         containsWord(strL,"horny")  ? rslt.description.push(str) :
         containsWord(strL,"shy")  ? rslt.description.push(str) :
         containsWord(strL,"dancer")  ? rslt.description.push(str) :
@@ -374,6 +382,7 @@ function toJson(text) {
         containsWord(strL,"down")     ? rslt.pose.push(str) :
         containsWord(strL,"standing") ? rslt.pose.push(str) :
         containsWord(strL,"lying")    ? rslt.pose.push(str) :
+        containsWord(strL,"sits")    ? rslt.pose.push(str) :
         containsWord(strL,"sitting")    ? rslt.pose.push(str) :
         containsWord(strL,"holding")  ? rslt.pose.push(str) :
         containsWord(strL,"squatting") ? rslt.pose.push(str) :
@@ -424,6 +433,8 @@ function toJson(text) {
         //
         containsWord(strL,"fellatio")  ? rslt.pose.push(str) :
         containsWord(strL,"blowjob")  ? rslt.pose.push(str) :
+        containsWord(strL,"deep thraot")  ? rslt.pose.push(str) :
+        containsWord(strL,"deepthroat")  ? rslt.pose.push(str) :
         containsWord(strL,"cunnilingus")  ? rslt.pose.push(str) :
         //
         containsWord(strL,"grab")  ? rslt.pose.push(str) :
@@ -597,6 +608,8 @@ function toJson(text) {
         containsWord(strL,"dynamic range")  ? rslt.style.push(str) :
         containsWord(strL,"colors")  ? rslt.style.push(str) :
         containsWord(strL,"colours")  ? rslt.style.push(str) :
+        containsWord(strL,"artistic")  ? rslt.style.push(str) :
+        containsWord(strL,"impressionistic")  ? rslt.style.push(str) :
         //
         containsWord(strL,"lighting") ? rslt.lighting.push(str) :
         containsWord(strL,"light")   ? rslt.lighting.push(str) :
