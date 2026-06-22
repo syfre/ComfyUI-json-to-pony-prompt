@@ -31,7 +31,11 @@ def make_file_path(name):
 
 def setup_routes():
 
-    folder_paths.folder_names_and_paths["templates"] = ([os.path.join(folder_paths.user_directory, "templates")],{".json"})
+    fpath = os.path.join(folder_paths.user_directory, "templates")
+    if not os.path.exists(fpath):
+        os.makedirs(fpath)
+
+    folder_paths.folder_names_and_paths["templates"] = ([fpath],{".json"})
 
     @PromptServer.instance.routes.get("/user/templates")
     async def get_templates(request):
@@ -59,6 +63,7 @@ def setup_routes():
         
         if fpath == "":
             return web.json_response('{rslt:1, msg:"invalid filename",filename:"'+name+'", len:0}')
+        
         
         content = data['content']
         with open(fpath, "w") as file:
