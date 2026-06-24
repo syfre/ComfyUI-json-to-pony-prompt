@@ -7,6 +7,11 @@ import json
 # [source style], [subject count], [subject description], [pose/action], [clothing], [setting], [lighting], [composition]
 #
 
+@classmethod    
+def INPUT_TYPES(s):
+    return { "required":  { "images": ("IMAGE",), 
+                            "mode": (["brightest", "reddest", "greenest", "bluest"],)} }
+
 class PonyJsonPrompt:
 
     @classmethod
@@ -17,8 +22,8 @@ class PonyJsonPrompt:
                     "multiline": True,
                     "default": '{"quality":["score_9","score_8_up","score_7_up","rating_explicit"],\n"subject":["1girl"],\n"description":["18yo","blonde hair","slim","cute face"],\n"pose":["lying on tanning chair"],\n"clothing":["blue towel under"],\n"environment":["pool in background"],\n"lighting":["bright sunlight"],\n"composition":["full body"],\n"boosters":["realistic skin","high quality","masterpiece","cinematic"]}'
                 }),
-                "linebreak": ("BOOLEAN", {
-                    "default": False
+                "separator": (["none","BREAK","line break"],{ 
+                    "default":"none"
                 })
             }
         }
@@ -47,7 +52,7 @@ class PonyJsonPrompt:
         "boosters"
     ]
 
-    def build_prompt(self, json_text, linebreak):
+    def build_prompt(self, json_text, separator):
         try:
             data = json.loads(json_text)
         except Exception as e:
@@ -56,7 +61,7 @@ class PonyJsonPrompt:
         sections = []
         sep = ", "
 
-        if linebreak:
+        if (separator=="line break"):
             sep = ",\n"
 
         for section in self.SECTION_ORDER:
@@ -75,6 +80,8 @@ class PonyJsonPrompt:
             ]
 
             if values:
+                if (separator=="BREAK"):
+                    values.append("BREAK")  
                 sections.append(", ".join(values))
 
         prompt = sep.join(sections)

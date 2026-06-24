@@ -173,7 +173,7 @@ function splitOutsideParens(str) {
     }
     //
     if ( ( (ch === ',') || (ch === ".") ) && (depth === 0) && (lora===0) ) {
-        if (current!='BREAK')  {
+        if (current !== 'BREAK')  {
             const term = current.trim()
             // if start by a connector then append to the last
             if ((term.startsWith("and ") || term.startsWith("with ")) && (result.strings.length>0)) {
@@ -181,6 +181,9 @@ function splitOutsideParens(str) {
             } else {
                 result.strings.push(term);
             }
+        } else {
+            // BREAK is token bunch separator
+            result.strings.push(current);
         }
         current = ''; 
     } else {
@@ -197,455 +200,494 @@ function containsWord(str, word) {
 }
 
 function toJson(text) {
-
+    // .replace(/BREAK/g, "")
     let rslt = JSON.parse(jsonEmpty);
-    const data = splitOutsideParens(text.replace(/BREAK/g, "").replace(/[\n\r]+/g, ''));
+    const data = splitOutsideParens(text.replace(/[\n\r]+/g, ''));
     const str_array = data.strings;
 
+    let lastSection = null; 
     for(var i = 0; i < str_array.length; i++) {
+        //
         const str = str_array[i];
+        if (str==="") continue;
+        //
+        if (str==="BREAK") {
+            if (lastSection) lastSection.push(str);
+            continue;
+        }
+        //
         const strL = str.toLowerCase().replace("_"," ");
 
-        str.startsWith("score")  ? rslt.quality.push(str) :
-        str.startsWith("Score")  ? rslt.quality.push(str.toLowerCase()) :
-        str.startsWith("rating") ? rslt.quality.push(str) :
-        str.startsWith("source") ? rslt.source.push(str) :
+        const section = 
+        str.startsWith("score")  ? rslt.quality :
+        str.startsWith("rating") ? rslt.quality :
         //
-        containsWord(strL,"1girl")    ? rslt.subject.push(str) :
-        containsWord(strL,"2girl")    ? rslt.subject.push(str) :
-        containsWord(strL,"2girls")    ? rslt.subject.push(str) :
-        containsWord(strL,"one girl")  ? rslt.subject.push(str) :
-        containsWord(strL,"hot girl")  ? rslt.subject.push(str) :
-        containsWord(strL,"two girls")  ? rslt.subject.push(str) :
-        containsWord(strL,"beautiful girl") ? rslt.subject.push(str) :
-        containsWord(strL,"1woman")    ? rslt.subject.push(str) :
-        containsWord(strL,"beautiful woman") ? rslt.subject.push(str) :
-        containsWord(strL,"young girl") ? rslt.subject.push(str) :
-        containsWord(strL,"1boy")     ? rslt.subject.push(str) :
-        containsWord(strL,"2boy")    ? rslt.subject.push(str) :
-        containsWord(strL,"2boys")    ? rslt.subject.push(str) :
-        containsWord(strL,"1man")     ? rslt.subject.push(str) :
-        containsWord(strL,"2man")     ? rslt.subject.push(str) :
-        containsWord(strL,"2men")     ? rslt.subject.push(str) :
-        containsWord(strL,"two boys")  ? rslt.subject.push(str) :
-        containsWord(strL,"couple")    ? rslt.subject.push(str) :
-        containsWord(strL,"gangbang")  ? rslt.subject.push(str) :
-        containsWord(strL,"gang bang")  ? rslt.subject.push(str) :
-        containsWord(strL,"old man")    ? rslt.subject.push(str) :
-        containsWord(strL,"middle age") ? rslt.subject.push(str) :
-        containsWord(strL,"elderly")    ? rslt.subject.push(str) :
-        containsWord(strL,"milf") ? rslt.subject.push(str) :
-        containsWord(strL,"mature") ? rslt.subject.push(str) :
-        containsWord(strL,"years")    ? rslt.subject.push(str) :
+        str.startsWith("source") ? rslt.source :
         //
-        containsWord(strL,"russian")  ? rslt.subject.push(str) :
-        containsWord(strL,"nordic") ? rslt.subject.push(str) :
-        containsWord(strL,"japanese") ? rslt.subject.push(str) :
-        containsWord(strL,"asian") ? rslt.subject.push(str) :
-        containsWord(strL,"african") ? rslt.subject.push(str) :
-        containsWord(strL,"european") ? rslt.subject.push(str) :
+        containsWord(strL,"girl") ? rslt.subject :
+        containsWord(strL,"girls")  ? rslt.subject :
+        containsWord(strL,"1girl")    ? rslt.subject :
+        containsWord(strL,"2girl")    ? rslt.subject :
+        containsWord(strL,"2girls")    ? rslt.subject :
+        containsWord(strL,"beautiful girl") ? rslt.subject :
+        containsWord(strL,"1woman")    ? rslt.subject :
+        containsWord(strL,"woman") ? rslt.subject :
+        containsWord(strL,"1boy")     ? rslt.subject :
+        containsWord(strL,"2boy")    ? rslt.subject :
+        containsWord(strL,"2boys")    ? rslt.subject :
+        containsWord(strL,"1man")     ? rslt.subject :
+        containsWord(strL,"2man")     ? rslt.subject :
+        containsWord(strL,"2men")     ? rslt.subject :
+        containsWord(strL,"two boys")  ? rslt.subject :
+        containsWord(strL,"couple")    ? rslt.subject :
+        containsWord(strL,"gangbang")  ? rslt.subject :
+        containsWord(strL,"gang bang")  ? rslt.subject :
+        containsWord(strL,"old man")    ? rslt.subject :
+        containsWord(strL,"middle age") ? rslt.subject :
+        containsWord(strL,"elderly")    ? rslt.subject :
+        containsWord(strL,"milf") ? rslt.subject :
+        containsWord(strL,"mature") ? rslt.subject :
+        containsWord(strL,"years")    ? rslt.subject :
         //
-        containsWord(strL,"blonde")   ? rslt.description.push(str) :
-        containsWord(strL,"brunette") ? rslt.description.push(str) :
-        containsWord(strL,"model")    ? rslt.description.push(str) :
-        containsWord(strL,"old")      ? rslt.description.push(str) :
-        containsWord(strL,"age")      ? rslt.description.push(str) :
-        containsWord(strL,"perfect")      ? rslt.description.push(str) :
-        containsWord(strL,"beauty")      ? rslt.description.push(str) :
-        containsWord(strL,"youthful")      ? rslt.description.push(str) :
+        containsWord(strL,"russian")  ? rslt.subject :
+        containsWord(strL,"nordic") ? rslt.subject :
+        containsWord(strL,"japanese") ? rslt.subject :
+        containsWord(strL,"asian") ? rslt.subject :
+        containsWord(strL,"african") ? rslt.subject :
+        containsWord(strL,"european") ? rslt.subject :
         //
-        containsWord(strL,"face")     ? rslt.description.push(str) :
-        containsWord(strL,"freckles") ? rslt.description.push(str) :
-        containsWord(strL,"dimples")  ? rslt.description.push(str) :
-        containsWord(strL,"skin")     ? rslt.description.push(str) :
-        containsWord(strL,"pores")     ? rslt.description.push(str) :
-        containsWord(strL,"makeup")   ? rslt.description.push(str) :
-        containsWord(strL,"tanlines")   ? rslt.description.push(str) :
-        containsWord(strL,"tattoos")   ? rslt.description.push(str) :
+        containsWord(strL,"blonde")   ? rslt.description :
+        containsWord(strL,"brunette") ? rslt.description :
+        containsWord(strL,"model")    ? rslt.description :
+        containsWord(strL,"old")      ? rslt.description :
+        containsWord(strL,"age")      ? rslt.description :
+        containsWord(strL,"perfect")      ? rslt.description :
+        containsWord(strL,"beauty")      ? rslt.description :
+        containsWord(strL,"youthful")      ? rslt.description :
+        //
+        containsWord(strL,"face")     ? rslt.description :
+        containsWord(strL,"freckles") ? rslt.description :
+        containsWord(strL,"dimples")  ? rslt.description :
+        containsWord(strL,"skin")     ? rslt.description :
+        containsWord(strL,"pores")     ? rslt.description :
+        containsWord(strL,"makeup")   ? rslt.description :
+        containsWord(strL,"tanlines")   ? rslt.description :
+        containsWord(strL,"tattoo")   ? rslt.description :
+        containsWord(strL,"tattoos")   ? rslt.description :
         //            
-        containsWord(strL,"nude")   ? rslt.description.push(str) :
-        containsWord(strL,"undressing")   ? rslt.description.push(str) :
-        containsWord(strL,"undressed")   ? rslt.description.push(str) :
-        containsWord(strL,"shaved")   ? rslt.description.push(str) :
-        containsWord(strL,"unshaved")  ? rslt.description.push(str) :
-        containsWord(strL,"topless")      ? rslt.description.push(str) :
-        containsWord(strL,"wet")  ? rslt.description.push(str) :
-        containsWord(strL,"tatooed")  ? rslt.description.push(str) :
+        containsWord(strL,"nude")   ? rslt.description :
+        containsWord(strL,"undressing")   ? rslt.description :
+        containsWord(strL,"undressed")   ? rslt.description :
+        containsWord(strL,"shaved")   ? rslt.description :
+        containsWord(strL,"unshaved")  ? rslt.description :
+        containsWord(strL,"topless")      ? rslt.description :
+        containsWord(strL,"wet")  ? rslt.description :
+        containsWord(strL,"sweat")  ? rslt.description :
+        containsWord(strL,"sweaty")  ? rslt.description :
+        containsWord(strL,"tatooed")  ? rslt.description :
         //
-        containsWord(strL,"hair")     ? rslt.description.push(str) :
-        containsWord(strL,"hairstyle")     ? rslt.description.push(str) :
-        containsWord(strL,"pigtails") ? rslt.description.push(str) :
-        containsWord(strL,"ponytail") ? rslt.description.push(str) :
-        containsWord(strL,"headwrap") ? rslt.description.push(str) :
-        containsWord(strL,"braids") ? rslt.description.push(str) :
-        containsWord(strL,"bangs") ? rslt.description.push(str) :
-        containsWord(strL,"haircut")  ? rslt.description.push(str) :
-        containsWord(strL,"hime cut")  ? rslt.description.push(str) :
+        containsWord(strL,"hair")     ? rslt.description :
+        containsWord(strL,"hairstyle")     ? rslt.description :
+        containsWord(strL,"pigtails") ? rslt.description :
+        containsWord(strL,"ponytail") ? rslt.description :
+        containsWord(strL,"headwrap") ? rslt.description :
+        containsWord(strL,"braids") ? rslt.description :
+        containsWord(strL,"bangs") ? rslt.description :
+        containsWord(strL,"cut")  ? rslt.description :
+        containsWord(strL,"bolcut")  ? rslt.description :
+        containsWord(strL,"haircut")  ? rslt.description :
+        containsWord(strL,"curls")  ? rslt.description :
+        containsWord(strL,"headdress")  ? rslt.description :
         //
-        containsWord(strL,"slender")  ? rslt.description.push(str) :
-        containsWord(strL,"petite")     ? rslt.description.push(str) :
-        containsWord(strL,"slim")     ? rslt.description.push(str) :
-        containsWord(strL,"skinny")   ? rslt.description.push(str) :
-        containsWord(strL,"muscular")   ? rslt.description.push(str) :
-        containsWord(strL,"curves")   ? rslt.description.push(str) :
-        containsWord(strL,"fit")   ? rslt.description.push(str) :
-        containsWord(strL,"sporty")   ? rslt.description.push(str) :
-        containsWord(strL,"puffy")    ? rslt.description.push(str) :
-        containsWord(strL,"hairy")    ? rslt.description.push(str) :
+        containsWord(strL,"slender")  ? rslt.description :
+        containsWord(strL,"petite")     ? rslt.description :
+        containsWord(strL,"slim")     ? rslt.description :
+        containsWord(strL,"skinny")   ? rslt.description :
+        containsWord(strL,"muscular")   ? rslt.description :
+        containsWord(strL,"curves")   ? rslt.description :
+        containsWord(strL,"fit")   ? rslt.description :
+        containsWord(strL,"sporty")   ? rslt.description :
+        containsWord(strL,"puffy")    ? rslt.description :
+        containsWord(strL,"hairy")    ? rslt.description :
         //
-        containsWord(strL,"head")    ? rslt.description.push(str) :
-        containsWord(strL,"eyes")     ? rslt.description.push(str) :
-        containsWord(strL,"eyebrows") ? rslt.description.push(str) :
-        containsWord(strL,"eyeshadow") ? rslt.description.push(str) :
-        containsWord(strL,"eyelashes") ? rslt.description.push(str) :
-        containsWord(strL,"eyeliner") ? rslt.description.push(str) :
-        containsWord(strL,"breast")   ? rslt.description.push(str) :
-        containsWord(strL,"breasts")  ? rslt.description.push(str) :
-        containsWord(strL,"boobs")  ? rslt.description.push(str) :
-        containsWord(strL,"areola")  ? rslt.description.push(str) :
-        containsWord(strL,"areolas")  ? rslt.description.push(str) :
-        containsWord(strL,"cleavage")  ? rslt.description.push(str) :
-        containsWord(strL,"tit")     ? rslt.description.push(str) :
-        containsWord(strL,"tits")     ? rslt.description.push(str) :
-        containsWord(strL,"nipple")  ? rslt.description.push(str) :
-        containsWord(strL,"nipples")  ? rslt.description.push(str) :
-        containsWord(strL,"pubic")    ? rslt.description.push(str) :
-        containsWord(strL,"mouth")    ? rslt.description.push(str) :
-        containsWord(strL,"cheeks")    ? rslt.description.push(str) :
-        containsWord(strL,"jawline")    ? rslt.description.push(str) :
-        containsWord(strL,"ears")     ? rslt.description.push(str) :
-        containsWord(strL,"lips")     ? rslt.description.push(str) :
-        containsWord(strL,"nose")     ? rslt.description.push(str) :
-        containsWord(strL,"tongue")   ? rslt.description.push(str) :
-        containsWord(strL,"belly")    ? rslt.description.push(str) :
-        containsWord(strL,"waist")    ? rslt.description.push(str) :
-        containsWord(strL,"shoulders")  ? rslt.description.push(str) :
-        containsWord(strL,"arms")     ? rslt.description.push(str) :
-        containsWord(strL,"armpits")  ? rslt.description.push(str) :
-        containsWord(strL,"hands")  ? rslt.description.push(str) :
-        containsWord(strL,"navel")  ? rslt.description.push(str) :
-        containsWord(strL,"hip")      ? rslt.description.push(str) :
-        containsWord(strL,"hips")      ? rslt.description.push(str) :
-        containsWord(strL,"thighs")   ? rslt.description.push(str) :
-        containsWord(strL,"ass")      ? rslt.description.push(str) :
-        containsWord(strL,"roundass")      ? rslt.description.push(str) :
-        containsWord(strL,"buttcheeks")      ? rslt.description.push(str) :
-        containsWord(strL,"buttocks")      ? rslt.description.push(str) :
-        containsWord(strL,"butt")      ? rslt.description.push(str) :
-        containsWord(strL,"bun")      ? rslt.description.push(str) :
-        containsWord(strL,"legs")      ? rslt.description.push(str) :
-        containsWord(strL,"feet")     ? rslt.description.push(str) :
+        containsWord(strL,"head")    ? rslt.description :
+        containsWord(strL,"eyes")     ? rslt.description :
+        containsWord(strL,"eyebrows") ? rslt.description :
+        containsWord(strL,"eyeshadow") ? rslt.description :
+        containsWord(strL,"eyelashes") ? rslt.description :
+        containsWord(strL,"eyeliner") ? rslt.description :
+        containsWord(strL,"breast")   ? rslt.description :
+        containsWord(strL,"breasts")  ? rslt.description :
+        containsWord(strL,"boobs")  ? rslt.description :
+        containsWord(strL,"areola")  ? rslt.description :
+        containsWord(strL,"areolas")  ? rslt.description :
+        containsWord(strL,"cleavage")  ? rslt.description :
+        containsWord(strL,"tit")     ? rslt.description :
+        containsWord(strL,"tits")     ? rslt.description :
+        containsWord(strL,"nipple")  ? rslt.description :
+        containsWord(strL,"nipples")  ? rslt.description :
+        containsWord(strL,"piercings")  ? rslt.description :
+        containsWord(strL,"pubic")    ? rslt.description :
+        containsWord(strL,"mouth")    ? rslt.description :
+        containsWord(strL,"cheeks")    ? rslt.description :
+        containsWord(strL,"jawline")    ? rslt.description :
+        containsWord(strL,"ears")     ? rslt.description :
+        containsWord(strL,"lips")     ? rslt.description :
+        containsWord(strL,"nose")     ? rslt.description :
+        containsWord(strL,"tongue")   ? rslt.description :
+        containsWord(strL,"belly")    ? rslt.description :
+        containsWord(strL,"chest")    ? rslt.description :
+        containsWord(strL,"waist")    ? rslt.description :
+        containsWord(strL,"shoulders")  ? rslt.description :
+        containsWord(strL,"arms")     ? rslt.description :
+        containsWord(strL,"armpits")  ? rslt.description :
+        containsWord(strL,"hands")  ? rslt.description :
+        containsWord(strL,"navel")  ? rslt.description :
+        containsWord(strL,"hip")      ? rslt.description :
+        containsWord(strL,"hips")      ? rslt.description :
+        containsWord(strL,"thighs")   ? rslt.description :
+        containsWord(strL,"ass")      ? rslt.description :
+        containsWord(strL,"roundass")      ? rslt.description :
+        containsWord(strL,"buttcheeks")      ? rslt.description :
+        containsWord(strL,"buttocks")      ? rslt.description :
+        containsWord(strL,"butt")      ? rslt.description :
+        containsWord(strL,"bun")      ? rslt.description :
+        containsWord(strL,"legs")      ? rslt.description :
+        containsWord(strL,"feet")     ? rslt.description :
+        containsWord(strL,"toes")     ? rslt.description :
         //
-        containsWord(strL,"pussy")    ? rslt.description.push(str) :
-        containsWord(strL,"vagina")   ? rslt.description.push(str) :
-        containsWord(strL,"labia")    ? rslt.description.push(str) :
-        containsWord(strL,"anus")    ? rslt.description.push(str) :
-        containsWord(strL,"dick")     ? rslt.description.push(str) :
-        containsWord(strL,"cock")     ? rslt.description.push(str) :
-        containsWord(strL,"penis")     ? rslt.description.push(str) :
-        containsWord(strL,"balls")     ? rslt.description.push(str) :
-        containsWord(strL,"testicles")  ? rslt.description.push(str) :
+        containsWord(strL,"pussy")    ? rslt.description :
+        containsWord(strL,"vagina")   ? rslt.description :
+        containsWord(strL,"labia")    ? rslt.description :
+        containsWord(strL,"vulvar")    ? rslt.description :
+        containsWord(strL,"crotch")    ? rslt.description :
+        containsWord(strL,"cameltoe")    ? rslt.description :
+        containsWord(strL,"toe")    ? rslt.description :
+        containsWord(strL,"anus")    ? rslt.description :
+        containsWord(strL,"dick")     ? rslt.description :
+        containsWord(strL,"cock")     ? rslt.description :
+        containsWord(strL,"penis")     ? rslt.description :
+        containsWord(strL,"balls")     ? rslt.description :
+        containsWord(strL,"testicles")  ? rslt.description :
         //
-        containsWord(strL,"girly")     ? rslt.description.push(str) :
-        containsWord(strL,"attractive")  ? rslt.description.push(str) :
-        containsWord(strL,"feminine")  ? rslt.description.push(str) :
-        containsWord(strL,"amateur")     ? rslt.description.push(str) :
-        containsWord(strL,"lilycat")    ? rslt.description.push(str) :
-        containsWord(strL,"look")     ? rslt.description.push(str) :
-        containsWord(strL,"seductive")  ? rslt.description.push(str) :
-        containsWord(strL,"adorable") ? rslt.description.push(str) :
-        containsWord(strL,"happy")    ? rslt.description.push(str) :
-        containsWord(strL,"smile")    ? rslt.description.push(str) :
-        containsWord(strL,"smiling")  ? rslt.description.push(str) :
-        containsWord(strL,"smirk")    ? rslt.description.push(str) :
-        containsWord(strL,"blush")    ? rslt.description.push(str) :
-        containsWord(strL,"expression") ? rslt.description.push(str) :
-        containsWord(strL,"expressionless")    ? rslt.description.push(str) :
-        containsWord(strL,"expressiveh")  ? rslt.description.push(str) :
-        containsWord(strL,"exhausted")  ? rslt.description.push(str) :
-        containsWord(strL,"confident")  ? rslt.description.push(str) :
-        containsWord(strL,"embarrassed")  ? rslt.description.push(str) :
-        containsWord(strL,"scared")  ? rslt.description.push(str) :
-        containsWord(strL,"despair")  ? rslt.description.push(str) :
-        containsWord(strL,"surprised")  ? rslt.description.push(str) :
-        containsWord(strL,"curious")  ? rslt.description.push(str) :
-        containsWord(strL,"horny")  ? rslt.description.push(str) :
-        containsWord(strL,"shy")  ? rslt.description.push(str) :
-        containsWord(strL,"dancer")  ? rslt.description.push(str) :
-        containsWord(strL,"pregnant")  ? rslt.description.push(str) :
+        containsWord(strL,"girly")     ? rslt.description :
+        containsWord(strL,"attractive")  ? rslt.description :
+        containsWord(strL,"feminine")  ? rslt.description :
+        containsWord(strL,"amateur")     ? rslt.description :
+        containsWord(strL,"lilycat")    ? rslt.description :
+        containsWord(strL,"look")     ? rslt.description :
+        containsWord(strL,"seductive")  ? rslt.description :
+        containsWord(strL,"adorable") ? rslt.description :
+        containsWord(strL,"sensual") ? rslt.description :
+        containsWord(strL,"bimbo")  ? rslt.description :
+        containsWord(strL,"happy")    ? rslt.description :
+        containsWord(strL,"smile")    ? rslt.description :
+        containsWord(strL,"smiling")  ? rslt.description :
+        containsWord(strL,"smirk")    ? rslt.description :
+        containsWord(strL,"blush")    ? rslt.description :
+        containsWord(strL,"flirty") ? rslt.description :
+        containsWord(strL,"expression") ? rslt.description :
+        containsWord(strL,"expressionless")    ? rslt.description :
+        containsWord(strL,"expressiveh")  ? rslt.description :
+        containsWord(strL,"exhausted")  ? rslt.description :
+        containsWord(strL,"confident")  ? rslt.description :
+        containsWord(strL,"embarrassed")  ? rslt.description :
+        containsWord(strL,"scared")  ? rslt.description :
+        containsWord(strL,"despair")  ? rslt.description :
+        containsWord(strL,"surprised")  ? rslt.description :
+        containsWord(strL,"curious")  ? rslt.description :
+        containsWord(strL,"horny")  ? rslt.description :
+        containsWord(strL,"shy")  ? rslt.description :
+        containsWord(strL,"dancer")  ? rslt.description :
+        containsWord(strL,"pregnant")  ? rslt.description :
         //
-        containsWord(strL,"creampie")  ? rslt.description.push(str) :
-        containsWord(strL,"cum")  ? rslt.description.push(str) :
-        containsWord(strL,"saliva")  ? rslt.description.push(str) :
+        containsWord(strL,"creampie")  ? rslt.description :
+        containsWord(strL,"cum")  ? rslt.description :
+        containsWord(strL,"saliva")  ? rslt.description :
         //
-        containsWord(strL,"up")       ? rslt.pose.push(str) :
-        containsWord(strL,"down")     ? rslt.pose.push(str) :
-        containsWord(strL,"standing") ? rslt.pose.push(str) :
-        containsWord(strL,"lying")    ? rslt.pose.push(str) :
-        containsWord(strL,"sits")    ? rslt.pose.push(str) :
-        containsWord(strL,"sitting")    ? rslt.pose.push(str) :
-        containsWord(strL,"holding")  ? rslt.pose.push(str) :
-        containsWord(strL,"squatting") ? rslt.pose.push(str) :
-        containsWord(strL,"spitting") ? rslt.pose.push(str) :
-        containsWord(strL,"kneeling") ? rslt.pose.push(str) :
-        containsWord(strL,"hand")     ? rslt.pose.push(str) :
-        containsWord(strL,"curvy")    ? rslt.pose.push(str) :
-        containsWord(strL,"arched")   ? rslt.pose.push(str) :
-        containsWord(strL,"fucked")   ? rslt.pose.push(str) :
-        containsWord(strL,"pussy")    ? rslt.pose.push(str) :
-        containsWord(strL,"wide")     ? rslt.pose.push(str) :
-        containsWord(strL,"spread")   ? rslt.pose.push(str) :
-        containsWord(strL,"gap")      ? rslt.pose.push(str) :
-        containsWord(strL,"closed")  ? rslt.pose.push(str) :
-        containsWord(strL,"pose")  ? rslt.pose.push(str) :
+        containsWord(strL,"up")       ? rslt.pose :
+        containsWord(strL,"down")     ? rslt.pose :
+        containsWord(strL,"standing") ? rslt.pose :
+        containsWord(strL,"lying")    ? rslt.pose :
+        containsWord(strL,"sits")    ? rslt.pose :
+        containsWord(strL,"sitting")    ? rslt.pose :
+        containsWord(strL,"holding")  ? rslt.pose :
+        containsWord(strL,"squatting") ? rslt.pose :
+        containsWord(strL,"spitting") ? rslt.pose :
+        containsWord(strL,"kneeling") ? rslt.pose :
+        containsWord(strL,"hand")     ? rslt.pose :
+        containsWord(strL,"curvy")    ? rslt.pose :
+        containsWord(strL,"arched")   ? rslt.pose :
+        containsWord(strL,"fucked")   ? rslt.pose :
+        containsWord(strL,"pussy")    ? rslt.pose :
+        containsWord(strL,"wide")     ? rslt.pose :
+        containsWord(strL,"spread")   ? rslt.pose :
+        containsWord(strL,"gap")      ? rslt.pose :
+        containsWord(strL,"closed")  ? rslt.pose :
+        containsWord(strL,"pose")  ? rslt.pose :
         //
-        containsWord(strL,"leaning")  ? rslt.pose.push(str) :
-        containsWord(strL,"spreading")  ? rslt.pose.push(str) :
-        containsWord(strL,"flashing")  ? rslt.pose.push(str) :
-        containsWord(strL,"closing")  ? rslt.pose.push(str) :
-        containsWord(strL,"riding")  ? rslt.pose.push(str) :
-        containsWord(strL,"gaping")     ? rslt.pose.push(str) :
-        containsWord(strL,"walking")  ? rslt.pose.push(str) :
-        containsWord(strL,"looking")  ? rslt.pose.push(str) :
-        containsWord(strL,"glasing")  ? rslt.pose.push(str) :
-        containsWord(strL,"watching")  ? rslt.pose.push(str) :
-        containsWord(strL,"breathing")  ? rslt.pose.push(str) :
-        containsWord(strL,"screaming")  ? rslt.pose.push(str) :
-        containsWord(strL,"crying")  ? rslt.pose.push(str) :
-        containsWord(strL,"fingering") ? rslt.pose.push(str) :
-        containsWord(strL,"drinking") ? rslt.pose.push(str) :
-        containsWord(strL,"cumming")  ? rslt.pose.push(str) :
-        containsWord(strL,"sunbathing")  ? rslt.pose.push(str) :
-        containsWord(strL,"provocating")  ? rslt.pose.push(str) :
-        containsWord(strL,"provocative")  ? rslt.pose.push(str) :
+        containsWord(strL,"leaning")  ? rslt.pose :
+        containsWord(strL,"spreading")  ? rslt.pose :
+        containsWord(strL,"flashing")  ? rslt.pose :
+        containsWord(strL,"closing")  ? rslt.pose :
+        containsWord(strL,"riding")  ? rslt.pose :
+        containsWord(strL,"gaping")     ? rslt.pose :
+        containsWord(strL,"walking")  ? rslt.pose :
+        containsWord(strL,"looking")  ? rslt.pose :
+        containsWord(strL,"glazing")  ? rslt.pose :
+        containsWord(strL,"watching")  ? rslt.pose :
+        containsWord(strL,"breathing")  ? rslt.pose :
+        containsWord(strL,"screaming")  ? rslt.pose :
+        containsWord(strL,"crying")  ? rslt.pose :
+        containsWord(strL,"fingering") ? rslt.pose :
+        containsWord(strL,"drinking") ? rslt.pose :
+        containsWord(strL,"cumming")  ? rslt.pose :
+        containsWord(strL,"sunbathing")  ? rslt.pose :
+        containsWord(strL,"provocating")  ? rslt.pose :
+        containsWord(strL,"provocative")  ? rslt.pose :
         //
-        containsWord(strL,"all fours")  ? rslt.pose.push(str) :
-        containsWord(strL,"on foours")  ? rslt.pose.push(str) :
-        containsWord(strL,"on knees")  ? rslt.pose.push(str) :
-        containsWord(strL,"one knee")  ? rslt.pose.push(str) :
-        containsWord(strL,"squat")  ? rslt.pose.push(str) :
+        containsWord(strL,"all fours")  ? rslt.pose :
+        containsWord(strL,"on foours")  ? rslt.pose :
+        containsWord(strL,"on back")  ? rslt.pose :
+        containsWord(strL,"on knees")  ? rslt.pose :
+        containsWord(strL,"one knee")  ? rslt.pose :
+        containsWord(strL,"squat")  ? rslt.pose :
         //
-        containsWord(strL,"doggy")  ? rslt.pose.push(str) :
-        containsWord(strL,"missionary")  ? rslt.pose.push(str) :
-        containsWord(strL,"cowgirl")  ? rslt.pose.push(str) :
-        containsWord(strL,"hardcore")  ? rslt.pose.push(str) :
-        containsWord(strL,"group sex")  ? rslt.pose.push(str) :
+        containsWord(strL,"doggy")  ? rslt.pose :
+        containsWord(strL,"missionary")  ? rslt.pose :
+        containsWord(strL,"cowgirl")  ? rslt.pose :
+        containsWord(strL,"hardcore")  ? rslt.pose :
+        containsWord(strL,"group sex")  ? rslt.pose :
         //
-        containsWord(strL,"fellatio")  ? rslt.pose.push(str) :
-        containsWord(strL,"blowjob")  ? rslt.pose.push(str) :
-        containsWord(strL,"deep thraot")  ? rslt.pose.push(str) :
-        containsWord(strL,"deepthroat")  ? rslt.pose.push(str) :
-        containsWord(strL,"cunnilingus")  ? rslt.pose.push(str) :
+        containsWord(strL,"fellatio")  ? rslt.pose :
+        containsWord(strL,"blowjob")  ? rslt.pose :
+        containsWord(strL,"deep thraot")  ? rslt.pose :
+        containsWord(strL,"deepthroat")  ? rslt.pose :
+        containsWord(strL,"cunnilingus")  ? rslt.pose :
         //
-        containsWord(strL,"grab")  ? rslt.pose.push(str) :
-        containsWord(strL,"grabing")  ? rslt.pose.push(str) :
+        containsWord(strL,"grab")  ? rslt.pose :
+        containsWord(strL,"grabing")  ? rslt.pose :
 
-        containsWord(strL,"penetration")  ? rslt.pose.push(str) :
-        containsWord(strL,"vaginal")  ? rslt.pose.push(str) :
-        containsWord(strL,"anal")     ? rslt.pose.push(str) :
-        containsWord(strL,"act")      ? rslt.pose.push(str) :
-        containsWord(strL,"bondage")      ? rslt.pose.push(str) :
-        containsWord(strL,"bdsm")      ? rslt.pose.push(str) :
-        containsWord(strL,"gagged")      ? rslt.pose.push(str) :
-        containsWord(strL,"bound") ? rslt.pose.push(str) :
-        containsWord(strL,"shibari") ? rslt.pose.push(str) :
-        containsWord(strL,"rope") ? rslt.pose.push(str) :
+        containsWord(strL,"penetration")  ? rslt.pose :
+        containsWord(strL,"vaginal")  ? rslt.pose :
+        containsWord(strL,"anal")     ? rslt.pose :
+        containsWord(strL,"act")      ? rslt.pose :
+        containsWord(strL,"bondage")      ? rslt.pose :
+        containsWord(strL,"bdsm")      ? rslt.pose :
+        containsWord(strL,"gagged")      ? rslt.pose :
+        containsWord(strL,"bound") ? rslt.pose :
+        containsWord(strL,"shibari") ? rslt.pose :
+        containsWord(strL,"rope") ? rslt.pose :
         //
-        containsWord(strL,"bikini")   ? rslt.clothing.push(str) :
-        containsWord(strL,"swimsuit")   ? rslt.clothing.push(str) :
-        containsWord(strL,"top")      ? rslt.clothing.push(str) :
-        containsWord(strL,"skirt")    ? rslt.clothing.push(str) :
-        containsWord(strL,"shirt")    ? rslt.clothing.push(str) :
-        containsWord(strL,"sweater")    ? rslt.clothing.push(str) :
-        containsWord(strL,"polo")    ? rslt.clothing.push(str) :
-        containsWord(strL,"pants")  ? rslt.clothing.push(str) :
-        containsWord(strL,"panties")  ? rslt.clothing.push(str) :
-        containsWord(strL,"pajama")  ? rslt.clothing.push(str) :
-        containsWord(strL,"shorts")  ? rslt.clothing.push(str) :
-        containsWord(strL,"strappy")  ? rslt.clothing.push(str) :
-        containsWord(strL,"bra")      ? rslt.clothing.push(str) :
-        containsWord(strL,"dress")    ? rslt.clothing.push(str) :
-        containsWord(strL,"drape")    ? rslt.clothing.push(str) :
-        containsWord(strL,"choker")   ? rslt.clothing.push(str) :
-        containsWord(strL,"halter")   ? rslt.clothing.push(str) :
-        containsWord(strL,"towel")    ? rslt.clothing.push(str) :
-        containsWord(strL,"shoes")    ? rslt.clothing.push(str) :
-        containsWord(strL,"high heels")    ? rslt.clothing.push(str) :
-        containsWord(strL,"sneakers")    ? rslt.clothing.push(str) :
-        containsWord(strL,"thongs")    ? rslt.clothing.push(str) :
-        containsWord(strL,"barefoot")  ? rslt.clothing.push(str) :
-        containsWord(strL,"socks")    ? rslt.clothing.push(str) :
-        containsWord(strL,"stockings")    ? rslt.clothing.push(str) :
-        containsWord(strL,"garter belt")  ? rslt.clothing.push(str) :
-        containsWord(strL,"sleeves")  ? rslt.clothing.push(str) :
-        containsWord(strL,"sleeveless")  ? rslt.clothing.push(str) :
-        containsWord(strL,"leggins")  ? rslt.clothing.push(str) :
-        containsWord(strL,"form-fitting")  ? rslt.clothing.push(str) :
-        containsWord(strL,"romper")  ? rslt.clothing.push(str) :
-        containsWord(strL,"playsuit")  ? rslt.clothing.push(str) :
-        containsWord(strL,"blouse")  ? rslt.clothing.push(str) :
-        containsWord(strL,"cap")  ? rslt.clothing.push(str) :
-        containsWord(strL,"staps")  ? rslt.clothing.push(str) :
-        containsWord(strL,"belts")  ? rslt.clothing.push(str) :
-        containsWord(strL,"oufit")  ? rslt.clothing.push(str) :
-        containsWord(strL,"cloth")  ? rslt.clothing.push(str) :
-        containsWord(strL,"clothes")  ? rslt.clothing.push(str) :
-        containsWord(strL,"clothing")  ? rslt.clothing.push(str) :
-        containsWord(strL,"wearing")  ? rslt.clothing.push(str) :
-        containsWord(strL,"fabric")  ? rslt.clothing.push(str) :
-        containsWord(strL,"see-through")  ? rslt.clothing.push(str) :
-        containsWord(strL,"hairband")  ? rslt.clothing.push(str) :
-        containsWord(strL,"blindfold")  ? rslt.clothing.push(str) :
+        containsWord(strL,"bikini")   ? rslt.clothing :
+        containsWord(strL,"swimsuit")   ? rslt.clothing :
+        containsWord(strL,"top")      ? rslt.clothing :
+        containsWord(strL,"skirt")    ? rslt.clothing :
+        containsWord(strL,"shirt")    ? rslt.clothing :
+        containsWord(strL,"sweater")    ? rslt.clothing :
+        containsWord(strL,"polo")    ? rslt.clothing :
+        containsWord(strL,"pants")  ? rslt.clothing :
+        containsWord(strL,"panties")  ? rslt.clothing :
+        containsWord(strL,"pajama")  ? rslt.clothing :
+        containsWord(strL,"nightgown")  ? rslt.clothing :
+        containsWord(strL,"shorts")  ? rslt.clothing :
+        containsWord(strL,"strappy")  ? rslt.clothing :
+        containsWord(strL,"bra")      ? rslt.clothing :
+        containsWord(strL,"dress")    ? rslt.clothing :
+        containsWord(strL,"robe")    ? rslt.clothing :
+        containsWord(strL,"drape")    ? rslt.clothing :
+        containsWord(strL,"choker")   ? rslt.clothing :
+        containsWord(strL,"halter")   ? rslt.clothing :
+        containsWord(strL,"towel")    ? rslt.clothing :
+        containsWord(strL,"shoes")    ? rslt.clothing :
+        containsWord(strL,"high heels")    ? rslt.clothing :
+        containsWord(strL,"sneakers")    ? rslt.clothing :
+        containsWord(strL,"thongs")    ? rslt.clothing :
+        containsWord(strL,"barefoot")  ? rslt.clothing :
+        containsWord(strL,"socks")    ? rslt.clothing :
+        containsWord(strL,"stockings")    ? rslt.clothing :
+        containsWord(strL,"socks")    ? rslt.clothing :
+        containsWord(strL,"pantyhose")    ? rslt.clothing :
+        containsWord(strL,"underwear")  ? rslt.clothing :
+        containsWord(strL,"lingerie")  ? rslt.clothing :
+        containsWord(strL,"sleeves")  ? rslt.clothing :
+        containsWord(strL,"sleeveless")  ? rslt.clothing :
+        containsWord(strL,"leggins")  ? rslt.clothing :
+        containsWord(strL,"form-fitting")  ? rslt.clothing :
+        containsWord(strL,"romper")  ? rslt.clothing :
+        containsWord(strL,"playsuit")  ? rslt.clothing :
+        containsWord(strL,"blouse")  ? rslt.clothing :
+        containsWord(strL,"cap")  ? rslt.clothing :
+        containsWord(strL,"staps")  ? rslt.clothing :
+        containsWord(strL,"belts")  ? rslt.clothing :
+        containsWord(strL,"ribbon")  ? rslt.clothing :
+        containsWord(strL,"oufit")  ? rslt.clothing :
+        containsWord(strL,"cloth")  ? rslt.clothing :
+        containsWord(strL,"clothes")  ? rslt.clothing :
+        containsWord(strL,"clothing")  ? rslt.clothing :
+        containsWord(strL,"wearing")  ? rslt.clothing :
+        containsWord(strL,"fabric")  ? rslt.clothing :
+        containsWord(strL,"see-through")  ? rslt.clothing :
+        containsWord(strL,"hairband")  ? rslt.clothing :
+        containsWord(strL,"blindfold")  ? rslt.clothing :
         //
-        containsWord(strL,"flight attendant")  ? rslt.clothing.push(str) :
-        containsWord(strL,"cheerleader")  ? rslt.clothing.push(str) :
-        containsWord(strL,"cosplay")  ? rslt.clothing.push(str) :
+        containsWord(strL,"flight attendant")  ? rslt.clothing :
+        containsWord(strL,"cheerleader")  ? rslt.clothing :
+        containsWord(strL,"cosplay")  ? rslt.clothing :
         //
-        containsWord(strL,"accessories")  ? rslt.clothing.push(str) :
-        containsWord(strL,"glasses")  ? rslt.clothing.push(str) :
-        containsWord(strL,"earrings") ? rslt.clothing.push(str) :
-        containsWord(strL,"jewelry") ? rslt.clothing.push(str) :
-        containsWord(strL,"bracelet") ? rslt.clothing.push(str) :
-        containsWord(strL,"headphones") ? rslt.clothing.push(str) :
-        containsWord(strL,"tape") ? rslt.clothing.push(str) :
-        containsWord(strL,"anklet") ? rslt.clothing.push(str) :
-
-        //
-        containsWord(strL,"wall")     ? rslt.environment.push(str) :
-        containsWord(strL,"walls")    ? rslt.environment.push(str) :
-        containsWord(strL,"window")   ? rslt.environment.push(str) :
-        containsWord(strL,"windows")  ? rslt.environment.push(str) :
-        containsWord(strL,"porch")  ? rslt.environment.push(str) :
-        containsWord(strL,"bedroom")  ? rslt.environment.push(str) :
-        containsWord(strL,"bathroom") ? rslt.environment.push(str) :
-        containsWord(strL,"shower") ? rslt.environment.push(str) :
-        containsWord(strL,"toilet")   ? rslt.environment.push(str) :
-        containsWord(strL,"lavatory")   ? rslt.environment.push(str) :
-        containsWord(strL,"kitchen")   ? rslt.environment.push(str) :
-        //
-        containsWord(strL,"street")   ? rslt.environment.push(str) :
-        containsWord(strL,"outdoors") ? rslt.environment.push(str) :
-        containsWord(strL,"indoors")  ? rslt.environment.push(str) :
-        containsWord(strL,"outdoor")  ? rslt.environment.push(str) :
-        containsWord(strL,"indoor")   ? rslt.environment.push(str) :
-        containsWord(strL,"cafe")     ? rslt.environment.push(str) :
-        containsWord(strL,"library")  ? rslt.environment.push(str) :
-        //
-        containsWord(strL,"water")    ? rslt.environment.push(str) :
-        containsWord(strL,"ocean")    ? rslt.environment.push(str) :
-        containsWord(strL,"riverside") ? rslt.environment.push(str) :
-        //
-        containsWord(strL,"computer") ? rslt.environment.push(str) :
-        containsWord(strL,"room")     ? rslt.environment.push(str) :
-        containsWord(strL,"floor")     ? rslt.environment.push(str) :
-        containsWord(strL,"ceiling")     ? rslt.environment.push(str) :
-        containsWord(strL,"bed")      ? rslt.environment.push(str) :
-        containsWord(strL,"lamp")     ? rslt.environment.push(str) :
-        containsWord(strL,"lantern")  ? rslt.environment.push(str) :
-        containsWord(strL,"lanterns") ? rslt.environment.push(str) :
-        containsWord(strL,"rugs")     ? rslt.environment.push(str) :
-        containsWord(strL,"bar")      ? rslt.environment.push(str) :
-        containsWord(strL,"mirror")   ? rslt.environment.push(str) :
-        containsWord(strL,"chair")    ? rslt.environment.push(str) :
-        containsWord(strL,"chairs")   ? rslt.environment.push(str) :
-        containsWord(strL,"stool")   ? rslt.environment.push(str) :
-        containsWord(strL,"seat")     ? rslt.environment.push(str) :
-        containsWord(strL,"futon")    ? rslt.environment.push(str) :
-        containsWord(strL,"poster")    ? rslt.environment.push(str) :
-        containsWord(strL,"beanbag")    ? rslt.environment.push(str) :
-        containsWord(strL,"table")    ? rslt.environment.push(str) :
-        containsWord(strL,"bench")    ? rslt.environment.push(str) :
-        containsWord(strL,"desk")     ? rslt.environment.push(str) :
-        containsWord(strL,"bin")      ? rslt.environment.push(str) :
-        containsWord(strL,"fridge")   ? rslt.environment.push(str) :
-        containsWord(strL,"piano")    ? rslt.environment.push(str) :
-        containsWord(strL,"mug")     ? rslt.environment.push(str) :
-        containsWord(strL,"shelf")     ? rslt.environment.push(str) :
-        containsWord(strL,"book")     ? rslt.environment.push(str) :
-        //
-        containsWord(strL,"forest")   ? rslt.environment.push(str) :
-        containsWord(strL,"garden")   ? rslt.environment.push(str) :
-        containsWord(strL,"grove")   ? rslt.environment.push(str) :
-        containsWord(strL,"sand")     ? rslt.environment.push(str) :
-        containsWord(strL,"beach")    ? rslt.environment.push(str) :
-        containsWord(strL,"tree")     ? rslt.environment.push(str) :
-        containsWord(strL,"plant")    ? rslt.environment.push(str) :
-        containsWord(strL,"plants")   ? rslt.environment.push(str) :
-        //
-        containsWord(strL,"party")    ? rslt.environment.push(str) :
-        containsWord(strL,"background") ? rslt.environment.push(str) :
-        containsWord(strL,"cabin") ? rslt.environment.push(str) :
-        containsWord(strL,"house") ? rslt.environment.push(str) :
-        containsWord(strL,"pool") ? rslt.environment.push(str) :
-        containsWord(strL,"fireplace") ? rslt.environment.push(str) :
-        //
-        containsWord(strL,"shot")     ? rslt.composition.push(str) :
-        containsWord(strL,"angle")    ? rslt.composition.push(str) :
-        containsWord(strL,"frame")    ? rslt.composition.push(str) :
-        containsWord(strL,"portrait") ? rslt.composition.push(str) :
-        containsWord(strL,"close-up") ? rslt.composition.push(str) :
-        containsWord(strL,"behind")   ? rslt.composition.push(str) :
-        containsWord(strL,"below")   ? rslt.composition.push(str) :
-        containsWord(strL,"above")   ? rslt.composition.push(str) :
-        containsWord(strL,"quater")   ? rslt.composition.push(str) :
-        containsWord(strL,"side")     ? rslt.composition.push(str) :
-        containsWord(strL,"view")     ? rslt.composition.push(str) :
-        containsWord(strL,"focus")    ? rslt.composition.push(str) :
-        containsWord(strL,"visible")  ? rslt.composition.push(str) :
-        containsWord(strL,"cropped")  ? rslt.composition.push(str) :
-        containsWord(strL,"midriff")  ? rslt.composition.push(str) :
-        containsWord(strL,"viewer")  ? rslt.composition.push(str) :
-        containsWord(strL,"rule of thirds")  ? rslt.composition.push(str) :
-
-        containsWord(strL,"film")  ? rslt.style.push(str) :
-        containsWord(strL,"35mm")  ? rslt.style.push(str) :
-        containsWord(strL,"depth of field")  ? rslt.style.push(str) :
-        containsWord(strL,"bokeh")  ? rslt.style.push(str) :
-        containsWord(strL,"grain")  ? rslt.style.push(str) :
-        containsWord(strL,"focal")  ? rslt.style.push(str) :
-        containsWord(strL,"aperture")  ? rslt.style.push(str) :
-        containsWord(strL,"lens")  ? rslt.style.push(str) :
-        containsWord(strL,"dynamic range")  ? rslt.style.push(str) :
-        containsWord(strL,"colors")  ? rslt.style.push(str) :
-        containsWord(strL,"colours")  ? rslt.style.push(str) :
-        containsWord(strL,"artistic")  ? rslt.style.push(str) :
-        containsWord(strL,"impressionistic")  ? rslt.style.push(str) :
-        //
-        containsWord(strL,"lighting") ? rslt.lighting.push(str) :
-        containsWord(strL,"light")   ? rslt.lighting.push(str) :
-        containsWord(strL,"night")   ? rslt.lighting.push(str) :
-        containsWord(strL,"nighttime")   ? rslt.lighting.push(str) :
-        containsWord(strL,"sunlight")  ? rslt.lighting.push(str) :
-        containsWord(strL,"sunray")  ? rslt.lighting.push(str) :
-        containsWord(strL,"sunset")  ? rslt.lighting.push(str) :
-        containsWord(strL,"shadows") ? rslt.lighting.push(str) :
-        containsWord(strL,"tones")  ? rslt.lighting.push(str) :
-        containsWord(strL,"atmosphere") ? rslt.lighting.push(str) :
-        containsWord(strL,"blushing") ? rslt.lighting.push(str) :
-        containsWord(strL,"dusk")     ? rslt.lighting.push(str) :
-        containsWord(strL,"glow")     ? rslt.lighting.push(str) :
-        containsWord(strL,"reflections") ? rslt.lighting.push(str) :
-        containsWord(strL,"flash")    ? rslt.boosters.push(str) :
-        //
-        containsWord(strL,"masterpiece")  ? rslt.boosters.push(str) :
-        containsWord(strL,"cinematic")    ? rslt.boosters.push(str) :
-        containsWord(strL,"professional") ? rslt.boosters.push(str) :
-        containsWord(strL,"photo")        ? rslt.boosters.push(str) :
-        containsWord(strL,"image")        ? rslt.boosters.push(str) :
-        containsWord(strL,"quality")      ? rslt.boosters.push(str) :
-        containsWord(strL,"highres")           ? rslt.boosters.push(str) :
-        containsWord(strL,"4k")           ? rslt.boosters.push(str) :
-        containsWord(strL,"8k")           ? rslt.boosters.push(str) :
-        containsWord(strL,"photorealism") ? rslt.boosters.push(str) :
-        containsWord(strL,"photorealistic") ? rslt.boosters.push(str) :
-        containsWord(strL,"realism") ? rslt.boosters.push(str) :
-        containsWord(strL,"realistic")    ? rslt.boosters.push(str) :
-        containsWord(strL,"aesthetic")    ? rslt.boosters.push(str) :
-        containsWord(strL,"detailed")    ? rslt.boosters.push(str) :
-        containsWord(strL,"sharp")    ? rslt.boosters.push(str) :
+        containsWord(strL,"accessories")  ? rslt.clothing :
+        containsWord(strL,"glasses")  ? rslt.clothing :
+        containsWord(strL,"earrings") ? rslt.clothing :
+        containsWord(strL,"jewelry") ? rslt.clothing :
+        containsWord(strL,"bracelet") ? rslt.clothing :
+        containsWord(strL,"headphones") ? rslt.clothing :
+        containsWord(strL,"tape") ? rslt.clothing :
+        containsWord(strL,"anklet") ? rslt.clothing :
+        containsWord(strL,"dildo") ? rslt.clothing :
         
 
-        ((str !== "") && (str !=="BREAK")) ? rslt.others.push(str) : (true) ;
+        //
+        containsWord(strL,"wall")     ? rslt.environment :
+        containsWord(strL,"walls")    ? rslt.environment :
+        containsWord(strL,"window")   ? rslt.environment :
+        containsWord(strL,"windows")  ? rslt.environment :
+        containsWord(strL,"porch")  ? rslt.environment :
+        containsWord(strL,"bedroom")  ? rslt.environment :
+        containsWord(strL,"bathroom") ? rslt.environment :
+        containsWord(strL,"shower") ? rslt.environment :
+        containsWord(strL,"toilet")   ? rslt.environment :
+        containsWord(strL,"lavatory")   ? rslt.environment :
+        containsWord(strL,"kitchen")   ? rslt.environment :
+        //
+        containsWord(strL,"street")   ? rslt.environment :
+        containsWord(strL,"outdoors") ? rslt.environment :
+        containsWord(strL,"indoors")  ? rslt.environment :
+        containsWord(strL,"outdoor")  ? rslt.environment :
+        containsWord(strL,"indoor")   ? rslt.environment :
+        containsWord(strL,"cafe")     ? rslt.environment :
+        containsWord(strL,"library")  ? rslt.environment :
+        //
+        containsWord(strL,"water")    ? rslt.environment :
+        containsWord(strL,"ocean")    ? rslt.environment :
+        containsWord(strL,"riverside") ? rslt.environment :
+        //
+        containsWord(strL,"computer") ? rslt.environment :
+        containsWord(strL,"room")     ? rslt.environment :
+        containsWord(strL,"floor")     ? rslt.environment :
+        containsWord(strL,"ceiling")     ? rslt.environment :
+        containsWord(strL,"bed")      ? rslt.environment :
+        containsWord(strL,"pillow")      ? rslt.environment :
+        containsWord(strL,"lamp")     ? rslt.environment :
+        containsWord(strL,"lantern")  ? rslt.environment :
+        containsWord(strL,"lanterns") ? rslt.environment :
+        containsWord(strL,"rugs")     ? rslt.environment :
+        containsWord(strL,"bar")      ? rslt.environment :
+        containsWord(strL,"mirror")   ? rslt.environment :
+        containsWord(strL,"chair")    ? rslt.environment :
+        containsWord(strL,"chairs")   ? rslt.environment :
+        containsWord(strL,"stool")   ? rslt.environment :
+        containsWord(strL,"seat")     ? rslt.environment :
+        containsWord(strL,"futon")    ? rslt.environment :
+        containsWord(strL,"poster")    ? rslt.environment :
+        containsWord(strL,"beanbag")    ? rslt.environment :
+        containsWord(strL,"table")    ? rslt.environment :
+        containsWord(strL,"bench")    ? rslt.environment :
+        containsWord(strL,"desk")     ? rslt.environment :
+        containsWord(strL,"bin")      ? rslt.environment :
+        containsWord(strL,"fridge")   ? rslt.environment :
+        containsWord(strL,"piano")    ? rslt.environment :
+        containsWord(strL,"mug")     ? rslt.environment :
+        containsWord(strL,"shelf")     ? rslt.environment :
+        containsWord(strL,"book")     ? rslt.environment :
+        //
+        containsWord(strL,"forest")   ? rslt.environment :
+        containsWord(strL,"garden")   ? rslt.environment :
+        containsWord(strL,"grove")   ? rslt.environment :
+        containsWord(strL,"sand")     ? rslt.environment :
+        containsWord(strL,"beach")    ? rslt.environment :
+        containsWord(strL,"tree")     ? rslt.environment :
+        containsWord(strL,"plant")    ? rslt.environment :
+        containsWord(strL,"plants")   ? rslt.environment :
+        //
+        containsWord(strL,"party")    ? rslt.environment :
+        containsWord(strL,"background") ? rslt.environment :
+        containsWord(strL,"cabin") ? rslt.environment :
+        containsWord(strL,"house") ? rslt.environment :
+        containsWord(strL,"pool") ? rslt.environment :
+        containsWord(strL,"fireplace") ? rslt.environment :
+        //
+        containsWord(strL,"composition")  ? rslt.composition :
+        containsWord(strL,"ratio")  ? rslt.composition :
+        containsWord(strL,"camera")  ? rslt.composition :
+        containsWord(strL,"shot")     ? rslt.composition :
+        containsWord(strL,"angle")    ? rslt.composition :
+        containsWord(strL,"frame")    ? rslt.composition :
+        containsWord(strL,"portrait") ? rslt.composition :
+        containsWord(strL,"close-up") ? rslt.composition :
+        containsWord(strL,"behind")   ? rslt.composition :
+        containsWord(strL,"below")   ? rslt.composition :
+        containsWord(strL,"above")   ? rslt.composition :
+        containsWord(strL,"quater")   ? rslt.composition :
+        containsWord(strL,"side")     ? rslt.composition :
+        containsWord(strL,"view")     ? rslt.composition :
+        containsWord(strL,"focus")    ? rslt.composition :
+        containsWord(strL,"visible")  ? rslt.composition :
+        containsWord(strL,"cropped")  ? rslt.composition :
+        containsWord(strL,"midriff")  ? rslt.composition :
+        containsWord(strL,"viewer")  ? rslt.composition :
+        containsWord(strL,"rule of thirds")  ? rslt.composition :
+
+        containsWord(strL,"film")  ? rslt.style :
+        containsWord(strL,"35mm")  ? rslt.style :
+        containsWord(strL,"depth of field")  ? rslt.style :
+        containsWord(strL,"bokeh")  ? rslt.style :
+        containsWord(strL,"grain")  ? rslt.style :
+        containsWord(strL,"focal")  ? rslt.style :
+        containsWord(strL,"aperture")  ? rslt.style :
+        containsWord(strL,"lens")  ? rslt.style :
+        containsWord(strL,"dynamic range")  ? rslt.style :
+        containsWord(strL,"colors")  ? rslt.style :
+        containsWord(strL,"colours")  ? rslt.style :
+        containsWord(strL,"artistic")  ? rslt.style :
+        containsWord(strL,"impressionistic")  ? rslt.style :
+        //
+        containsWord(strL,"lighting") ? rslt.lighting :
+        containsWord(strL,"light")   ? rslt.lighting :
+        containsWord(strL,"night")   ? rslt.lighting :
+        containsWord(strL,"nighttime")   ? rslt.lighting :
+        containsWord(strL,"sunlight")  ? rslt.lighting :
+        containsWord(strL,"daylight")  ? rslt.lighting :
+        containsWord(strL,"sunray")  ? rslt.lighting :
+        containsWord(strL,"sunset")  ? rslt.lighting :
+        containsWord(strL,"shadows") ? rslt.lighting :
+        containsWord(strL,"tones")  ? rslt.lighting :
+        containsWord(strL,"atmosphere") ? rslt.lighting :
+        containsWord(strL,"blushing") ? rslt.lighting :
+        containsWord(strL,"dusk")     ? rslt.lighting :
+        containsWord(strL,"glow")     ? rslt.lighting :
+        containsWord(strL,"reflections") ? rslt.lighting :
+        containsWord(strL,"flash")    ? rslt.boosters :
+        //
+        containsWord(strL,"masterpiece")  ? rslt.boosters :
+        containsWord(strL,"cinematic")    ? rslt.boosters :
+        containsWord(strL,"professional") ? rslt.boosters :
+        containsWord(strL,"photo")        ? rslt.boosters :
+        containsWord(strL,"image")        ? rslt.boosters :
+        containsWord(strL,"quality")      ? rslt.boosters :
+        containsWord(strL,"highres")           ? rslt.boosters :
+        containsWord(strL,"4k")           ? rslt.boosters :
+        containsWord(strL,"8k")           ? rslt.boosters :
+        containsWord(strL,"photorealism") ? rslt.boosters :
+        containsWord(strL,"photorealistic") ? rslt.boosters :
+        containsWord(strL,"realism") ? rslt.boosters :
+        containsWord(strL,"realistic")    ? rslt.boosters :
+        containsWord(strL,"aesthetic")    ? rslt.boosters :
+        containsWord(strL,"detailed")    ? rslt.boosters :
+        containsWord(strL,"sharp")    ? rslt.boosters :
+        (str !== "")  ? rslt.others : null ;
+
+        if (section) section.push(str)
+        lastSection = section;
     }
 
     if (data.loras.length>0) {
