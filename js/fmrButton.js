@@ -240,6 +240,7 @@ function toJson(text) {
         containsWord(strL,"2men")     ? rslt.subject :
         containsWord(strL,"two boys")  ? rslt.subject :
         containsWord(strL,"couple")    ? rslt.subject :
+        containsWord(strL,"solo")    ? rslt.subject :
         containsWord(strL,"gangbang")  ? rslt.subject :
         containsWord(strL,"gang bang")  ? rslt.subject :
         containsWord(strL,"old man")    ? rslt.subject :
@@ -271,6 +272,7 @@ function toJson(text) {
         containsWord(strL,"skin")     ? rslt.description :
         containsWord(strL,"pores")     ? rslt.description :
         containsWord(strL,"makeup")   ? rslt.description :
+        containsWord(strL,"lipstick")   ? rslt.description :
         containsWord(strL,"tanlines")   ? rslt.description :
         containsWord(strL,"tattoo")   ? rslt.description :
         containsWord(strL,"tattoos")   ? rslt.description :
@@ -637,6 +639,7 @@ function toJson(text) {
         containsWord(strL,"viewer")  ? rslt.composition :
         containsWord(strL,"rule of thirds")  ? rslt.composition :
 
+        containsWord(strL,"style")  ? rslt.style :
         containsWord(strL,"film")  ? rslt.style :
         containsWord(strL,"35mm")  ? rslt.style :
         containsWord(strL,"depth of field")  ? rslt.style :
@@ -646,10 +649,16 @@ function toJson(text) {
         containsWord(strL,"aperture")  ? rslt.style :
         containsWord(strL,"lens")  ? rslt.style :
         containsWord(strL,"dynamic range")  ? rslt.style :
+        containsWord(strL,"color")  ? rslt.style :
         containsWord(strL,"colors")  ? rslt.style :
         containsWord(strL,"colours")  ? rslt.style :
+        containsWord(strL,"art")  ? rslt.style :
         containsWord(strL,"artistic")  ? rslt.style :
         containsWord(strL,"impressionistic")  ? rslt.style :
+        containsWord(strL,"screenprinting")  ? rslt.style :
+        containsWord(strL,"illustration")  ? rslt.style :
+        containsWord(strL,"kitsch")  ? rslt.style :
+        containsWord(strL,"printing")  ? rslt.style :
         //
         containsWord(strL,"lighting") ? rslt.lighting :
         containsWord(strL,"light")   ? rslt.lighting :
