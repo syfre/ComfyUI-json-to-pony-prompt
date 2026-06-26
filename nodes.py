@@ -56,7 +56,7 @@ class PonyJsonPrompt:
         try:
             data = json.loads(json_text)
         except Exception as e:
-            return (json_text, "{}")
+            raise ValueError(f"json convert error {e}") 
 
         sections = []
         sep = ", "
